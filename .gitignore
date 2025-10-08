@@ -2,3 +2,6 @@ dist/
 build/
 .env
 
+
+# Env files (backend)
+backend/.env*
