@@ -1,7 +1,8 @@
 dist/
 build/
 .env
-
+.DS_Store
 
 # Env files (backend)
 backend/.env*
+.DS_Store
