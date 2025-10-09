@@ -1,22 +1,12 @@
-import { Schema, model } from 'mongoose';
+import mongoose, { Schema, Document } from "mongoose";
 
-const userSchema = new Schema(
-	{
-		firstName: { type: String, required: [true, 'First name is required'] },
-		lastName: { type: String, required: [true, 'last name is required'] },
-		email: {
-			type: String,
-			required: [true, 'Email is required'],
-			unique: true,
-			lowercase: true
-		},
-		password: {
-			type: String,
-			required: [true, 'Password is required'],
-			select: false
-		}
-	},
-	{ timestamps: true }
-);
+export interface IUser extends Document {
+  email: string;
+  // We only keep a reference here — the actual auth service may manage users.
+}
 
-export default model('User', userSchema);
+const UserSchema = new Schema<IUser>({
+  email: { type: String, required: true, unique: true },
+});
+
+export default mongoose.model("User", UserSchema);
