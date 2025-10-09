@@ -1,12 +1,18 @@
 # projekt-pokemon
 
--- /account/ login /register
+-- /login 
+
+-- /register
 
 -- /Home
 
 -- /battle
 
+-- /my-roster
+
 -- /leaderboard
+
+-- /search
 
 -- update or change is willcommen!
 
