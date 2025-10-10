@@ -1,19 +1,16 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Home from "./pages/Home";
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
-// import HomePage from "./pages/HomePage";
-// import PokemonDetailsPage from "./pages/PokemonDetailsPage";
-// import MyRosterPage from "./pages/MyRosterPage";
-// import BattlePage from "./pages/BattlePage";
-// import LeaderboardPage from "./pages/LeaderboardPage";
-// import ProtectedRoute from "./components/ProtectedRoute";
 
-function App() {
+const App = () => {
   return (
     <BrowserRouter>
       <Routes>
+        <Route index element={<Home />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="*" element={<Navigate to="/" />} />
         {/* <Route
           path="/"
           element={
@@ -54,10 +51,9 @@ function App() {
             </ProtectedRoute>
           }
         /> */}
-        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
   );
-}
+};
 
 export default App;
