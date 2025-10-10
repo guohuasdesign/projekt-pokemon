@@ -1,6 +1,6 @@
 import express from "express";
-import { Score } from "../models/score.ts";
-import { authMiddleware } from "../middleware/authmiddleware.ts";
+import Score from "../models/Score.ts";
+import { authMiddleware } from "../middleware/authMiddleware.ts";
 
 const router = express.Router();
 
