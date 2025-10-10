@@ -12,5 +12,4 @@ const ScoreSchema = new Schema<IScore>({
   date: { type: Date, default: Date.now },
 });
 
-//export const Score = mongoose.model<IScore>("Score", ScoreSchema);
-export default mongoose.model("Score", ScoreSchema);
+export const Score = mongoose.model("Score", ScoreSchema);
