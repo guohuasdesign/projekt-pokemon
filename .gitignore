@@ -6,3 +6,4 @@ build/
 # Env files (backend)
 backend/.env*
 .DS_Store
+node_modules/

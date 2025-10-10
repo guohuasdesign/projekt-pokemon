@@ -1,6 +1,6 @@
 # Pokémon API (backend)
 ## Stack
-Express + TypeScript + MongoDB (Atlas) + JWT verify
+Express + Zod + TypeScript + MongoDB (Atlas) + JWT verify
 
 
 ## Getting Started
@@ -8,3 +8,4 @@ Express + TypeScript + MongoDB (Atlas) + JWT verify
 cp .env.development.local
 npm install
 npm run dev
+
