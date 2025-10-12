@@ -7,6 +7,8 @@
 ## 📦 Installation
 npm i react-hook-form zod @hookform/resolvers
 npm i chart.js react-chartjs-2
+npm i framer-motion
+
 
 ##
 App.tsx

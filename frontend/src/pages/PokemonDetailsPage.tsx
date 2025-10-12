@@ -3,10 +3,13 @@ import { useParams, Link } from "react-router-dom";
 import { getPokemon, type Pokemon, padId } from "../lib/pokemonAPI";
 import { addToRoster, inRoster } from "../lib/roster";
 import TypeBadge from "../components/TypeBadge";
-import StatsRadar from "../components/StarsRadar";
+import StatsRadar from "../components/StatsRadar";
+import { useNavigate } from "react-router-dom";
 
 export default function PokemonDetailsPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
+
   const [data, setData] = useState<Pokemon | null>(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
@@ -28,6 +31,12 @@ export default function PokemonDetailsPage() {
       }
     })();
   }, [id]);
+
+  // ✅ Select Pokémon for battle
+  function selectForBattle(pokemon: Pokemon) {
+    localStorage.setItem("selectedPokemon", JSON.stringify(pokemon));
+    navigate("/battle"); // Go to battle page
+  }
 
   const handleAddToRoster = () => {
     if (data) {
@@ -61,24 +70,32 @@ export default function PokemonDetailsPage() {
         </div>
 
         {/* info */}
-        <div className="md:col-span-3">
+        <div className="md:col-span-3 ">
           <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold capitalize">
+            <h1 className="text-3xl font-bold capitalize rounded-lg px-4 py-2 bg-emerald-50">
               {data.name}{" "}
               <span className="text-slate-400">#{padId(data.id)}</span>
             </h1>
+
             {!isInRoster ? (
               <button
                 onClick={handleAddToRoster}
                 className="text-sm rounded-lg px-4 py-2 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-colors font-medium"
               >
-                Add to Roster
+                Add to My Roster
               </button>
             ) : (
               <span className="text-sm rounded-lg px-4 py-2 bg-slate-100 text-slate-600 font-medium">
                 In Roster
               </span>
             )}
+
+            <button
+              onClick={() => selectForBattle(data)}
+              className="text-sm rounded-lg px-3 py-2 bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+            >
+              Select to battle
+            </button>
           </div>
 
           <div className="mt-2 flex gap-2">
@@ -87,18 +104,18 @@ export default function PokemonDetailsPage() {
             ))}
           </div>
 
-          <section className="mt-6">
-            <h2 className="text-xl font-semibold mb-2">Abilities</h2>
-            <ul className="list-disc list-inside capitalize text-slate-700">
+          <section className="mt-4 rounded-lg px-4 py-2 bg-emerald-50">
+            <h2 className="text-xl font-semibold mb-2 ">Abilities</h2>
+            <ul className="list-disc list-inside capitalize text-slate-700 ">
               {data.abilities.map((a) => (
                 <li key={a}>{a}</li>
               ))}
             </ul>
           </section>
 
-          <section className="mt-6">
-            <h2 className="text-xl font-semibold mb-2">Base Stats</h2>
+          <section className="mt-4">
             <div className=" bg-emerald-50 rounded-2xl shadow p-4">
+            <h2 className="text-xl font-semibold mb-2">Base Stats</h2>
               <StatsRadar stats={data.stats} />
             </div>
           </section>

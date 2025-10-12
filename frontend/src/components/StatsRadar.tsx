@@ -22,7 +22,7 @@ type Stat = { label: string; value: number };
 
 const StatsRadar = ({ stats }: { stats: Stat[] }) => {
   const order = [
-    "hp",
+    "hit points",
     "attack",
     "defense",
     "special-attack",

@@ -2,14 +2,16 @@ import { useEffect, useMemo, useState } from "react";
 import { loadRoster, removeFromRoster, saveRoster } from "../lib/roster";
 import { getPokemon, type Pokemon } from "../lib/pokemonAPI";
 import PokemonCard from "../components/PokemonCard";
+import { useNavigate } from "react-router-dom";
 
 export default function MyRosterPage() {
   const [ids, setIds] = useState<number[]>(() => loadRoster());
   const [list, setList] = useState<Pokemon[]>([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const navigate = useNavigate();
 
-  // Total base stats (just a fun summary)
+  // 🧮 Total base stats
   const total = useMemo(
     () =>
       list.reduce(
@@ -19,13 +21,9 @@ export default function MyRosterPage() {
     [list]
   );
 
-  // Listen for roster changes & sync across tabs/pages
-  // - "roster:update": custom event (dispatch in roster.ts after saveRoster)
-  // - "storage": native event for cross-tab sync
-  // - "visibilitychange": refresh when user switches back to this tab
+  // 🔁 Sync roster changes
   useEffect(() => {
     const refresh = () => setIds(loadRoster());
-
     window.addEventListener("roster:update", refresh);
     window.addEventListener("storage", refresh);
 
@@ -34,8 +32,7 @@ export default function MyRosterPage() {
     };
     document.addEventListener("visibilitychange", onVisible);
 
-    // initial sync on mount
-    refresh();
+    refresh(); // initial load
 
     return () => {
       window.removeEventListener("roster:update", refresh);
@@ -44,7 +41,7 @@ export default function MyRosterPage() {
     };
   }, []);
 
-  // Fetch details whenever IDs change
+  // 🧩 Fetch Pokémon details
   useEffect(() => {
     if (ids.length === 0) {
       setList([]);
@@ -64,16 +61,25 @@ export default function MyRosterPage() {
     })();
   }, [ids]);
 
+  // ❌ Remove Pokémon
   function remove(id: number) {
     removeFromRoster(id);
     setIds(loadRoster());
   }
 
+  // 🧹 Clear all Pokémon
   function clearAll() {
-    saveRoster([]); // clear all
+    saveRoster([]);
     setIds([]);
   }
 
+  // ✅ Select Pokémon for battle
+  function selectForBattle(pokemon: Pokemon) {
+    localStorage.setItem("selectedPokemon", JSON.stringify(pokemon));
+    navigate("/battle"); // Go to battle page
+  }
+
+  // 🖼️ UI rendering
   if (loading && list.length === 0) return <div className="p-6">Loading…</div>;
   if (err) return <div className="p-6 text-red-600">{err}</div>;
 
@@ -83,7 +89,7 @@ export default function MyRosterPage() {
         <div>
           <h1 className="text-2xl font-bold">My Roster</h1>
           <p className="text-slate-600 text-sm">
-            {ids.length} pokémon · Total base stats:{" "}
+            {ids.length} Pokémon · Total base stats:{" "}
             <span className="font-semibold">{total}</span>
           </p>
         </div>
@@ -110,12 +116,20 @@ export default function MyRosterPage() {
               name={p.name}
               image={p.image}
               right={
-                <button
-                  onClick={() => remove(p.id)}
-                  className="text-sm rounded-lg px-3 py-2 bg-rose-100 text-rose-700 hover:bg-rose-200"
-                >
-                  Remove
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => selectForBattle(p)}
+                    className="text-sm rounded-lg px-3 py-2 bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+                  >
+                    Select to battle
+                  </button>
+                  <button
+                    onClick={() => remove(p.id)}
+                    className="text-sm rounded-lg px-3 py-2 bg-rose-100 text-rose-700 hover:bg-rose-200"
+                  >
+                    Remove
+                  </button>
+                </div>
               }
             />
           ))}
