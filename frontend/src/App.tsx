@@ -5,6 +5,8 @@ import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
 import PokemonDetailsPage from "./pages/PokemonDetailsPage";
 import MyRosterPage from "./pages/MyRosterPage";
+import BattlePage from "./pages/BattlePage";
+import LeaderboardPage from "./pages/LeaderboardPage";
 
 const App = () => {
   return (
@@ -17,6 +19,10 @@ const App = () => {
           <Route path="register" element={<RegisterPage />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="*" element={<Navigate to="/" />} />
+
+          <Route path="/battle" element={<BattlePage />} />
+          <Route path="/leaderboard" element={<LeaderboardPage />} />
+
         </Route>
       </Routes>
     </BrowserRouter>

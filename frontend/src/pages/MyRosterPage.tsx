@@ -9,18 +9,52 @@ export default function MyRosterPage() {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
-  // 总能力值（小彩蛋）
+  // Total base stats (just a fun summary)
   const total = useMemo(
-    () => list.reduce((sum, p) => sum + p.stats.reduce((s, x) => s + x.value, 0), 0),
+    () =>
+      list.reduce(
+        (sum, p) => sum + p.stats.reduce((s, x) => s + x.value, 0),
+        0
+      ),
     [list]
   );
 
+  // Listen for roster changes & sync across tabs/pages
+  // - "roster:update": custom event (dispatch in roster.ts after saveRoster)
+  // - "storage": native event for cross-tab sync
+  // - "visibilitychange": refresh when user switches back to this tab
   useEffect(() => {
-    if (ids.length === 0) { setList([]); return; }
+    const refresh = () => setIds(loadRoster());
+
+    window.addEventListener("roster:update", refresh);
+    window.addEventListener("storage", refresh);
+
+    const onVisible = () => {
+      if (document.visibilityState === "visible") refresh();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+
+    // initial sync on mount
+    refresh();
+
+    return () => {
+      window.removeEventListener("roster:update", refresh);
+      window.removeEventListener("storage", refresh);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, []);
+
+  // Fetch details whenever IDs change
+  useEffect(() => {
+    if (ids.length === 0) {
+      setList([]);
+      return;
+    }
     (async () => {
       try {
-        setLoading(true); setErr(null);
-        const results = await Promise.all(ids.map(id => getPokemon(id)));
+        setLoading(true);
+        setErr(null);
+        const results = await Promise.all(ids.map((id) => getPokemon(id)));
         setList(results);
       } catch (e: any) {
         setErr(e.message || "Failed to load roster");
@@ -36,7 +70,7 @@ export default function MyRosterPage() {
   }
 
   function clearAll() {
-    saveRoster([]); // 清空
+    saveRoster([]); // clear all
     setIds([]);
   }
 
@@ -49,22 +83,27 @@ export default function MyRosterPage() {
         <div>
           <h1 className="text-2xl font-bold">My Roster</h1>
           <p className="text-slate-600 text-sm">
-            {ids.length} pokémon · Total base stats: <span className="font-semibold">{total}</span>
+            {ids.length} pokémon · Total base stats:{" "}
+            <span className="font-semibold">{total}</span>
           </p>
         </div>
         {ids.length > 0 && (
-          <button onClick={clearAll}
-            className="text-sm rounded-lg px-3 py-2 bg-slate-200 hover:bg-slate-300">
+          <button
+            onClick={clearAll}
+            className="text-sm rounded-lg px-3 py-2 bg-slate-200 hover:bg-slate-300"
+          >
             Clear All
           </button>
         )}
       </div>
 
       {ids.length === 0 ? (
-        <div className="text-slate-600">Your roster is empty. Go to a Pokémon page and click “Add to Roster”.</div>
+        <div className="text-slate-600">
+          Your roster is empty. Go to a Pokémon page and click “Add to Roster”.
+        </div>
       ) : (
         <div className="grid gap-3">
-          {list.map(p => (
+          {list.map((p) => (
             <PokemonCard
               key={p.id}
               id={p.id}
