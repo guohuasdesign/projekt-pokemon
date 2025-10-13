@@ -22,7 +22,6 @@ const App = () => {
 
           <Route path="/battle" element={<BattlePage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
-
         </Route>
       </Routes>
     </BrowserRouter>

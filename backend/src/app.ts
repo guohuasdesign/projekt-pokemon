@@ -1,9 +1,18 @@
 import express from "express";
 import "./db/index.ts";
 import leaderboardRoutes from "./routers/leaderboardRoutes.ts";
+import cors from "cors";
+import dotenv from "dotenv";
 //import { errorHandler, notFound } from "./middleware/index.ts";
-
+dotenv.config();
 const app = express();
+app.use(
+  cors({
+    origin: "http://localhost:5173", // your frontend
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
