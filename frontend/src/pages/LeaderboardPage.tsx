@@ -4,6 +4,7 @@ interface Score {
   _id: string;
   score: number;
   userId: string;
+  name: string;
 }
 
 export default function LeaderboardPage() {
@@ -30,6 +31,7 @@ export default function LeaderboardPage() {
         if (!res.ok) throw new Error("Failed to fetch leaderboard");
 
         const data = await res.json();
+        console.log(scores);
         setScores(data.data);
       } catch (err: any) {
         console.error(err);
