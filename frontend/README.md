@@ -18,8 +18,6 @@ App.tsx
         └── HomePage.tsx (content)
             └── PokemonLists.tsx (display the Pokemon Lists)
                 └── PokemonDetailsPage.tsx (display each Pokemon Details)
-
-        └── MyRosterPage.tsx (show the user saved Pokemons)
         └──MyBattle.tsx (user could not save the battle result)
 └──AuthLayout.tsx (after user has signed in)
     ├── Nav.tsx
@@ -27,7 +25,8 @@ App.tsx
             └── HomePage.tsx (content)
                 └── PokemonLists.tsx (display the Pokemon Lists)
                     └── PokemonDetailsPage.tsx (display each Pokemon Details)
-            └── MyRosterPage.tsx (show the user saved Pokemons)
             └── MyBattle.tsx (user could save the battle result)
+            └── MyRosterPage.tsx (show the user saved Pokemons)
+            └── MyRosterPage.tsx (show the user saved Pokemons)
             └── Leaderboard.tsx (user could see the ranking)
 ```

@@ -121,7 +121,7 @@ export default function BattlePage() {
           </h2>
           <div className="flex flex-col md:flex-row items-center gap-4">
             {/* Stats Radar */}
-            <div className="w-40 h-40 md:w-48 md:h-48 bg-white/40 rounded-xl p-2 shadow-sm backdrop-blur-sm">
+            <div className="w-50 h-50 md:w-48 md:h-48 bg-white/40 rounded-xl p-2 shadow-sm backdrop-blur-sm">
               <StatsRadar stats={player.stats} />
             </div>
             {/* Pokémon image */}

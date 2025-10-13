@@ -4,8 +4,9 @@ import HomePage from "./pages/HomePage";
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
 import PokemonDetailsPage from "./pages/PokemonDetailsPage";
-import MyRosterPage from "./pages/MyRosterPage";
 import BattlePage from "./pages/BattlePage";
+import ProtectedRoute from "./components/ProtectedRoute";
+import MyRosterPage from "./pages/MyRosterPage";
 import LeaderboardPage from "./pages/LeaderboardPage";
 
 const App = () => {
@@ -13,16 +14,33 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<MainLayout />}>
+          {/* public */}
           <Route index element={<HomePage />} />
           <Route path="pokemon/:id" element={<PokemonDetailsPage />} />
-          <Route path="my-roster" element={<MyRosterPage />} />
           <Route path="register" element={<RegisterPage />} />
           <Route path="login" element={<LoginPage />} />
-          <Route path="*" element={<Navigate to="/" />} />
-
           <Route path="/battle" element={<BattlePage />} />
-          <Route path="/leaderboard" element={<LeaderboardPage />} />
+
+          {/* protected */}
+          <Route
+            path="my-roster"
+            element={
+              <ProtectedRoute>
+                <MyRosterPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/leaderboard"
+            element={
+              <ProtectedRoute>
+                <LeaderboardPage />
+              </ProtectedRoute>
+            }
+          />
         </Route>
+
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
   );
