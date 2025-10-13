@@ -6,6 +6,7 @@ import TypeBadge from "../components/TypeBadge";
 import StatsRadar from "../components/StatsRadar";
 import { useNavigate } from "react-router-dom";
 
+
 export default function PokemonDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -78,7 +79,7 @@ export default function PokemonDetailsPage() {
             </h1>
 
             {!isInRoster ? (
-              <button
+                <button
                 onClick={handleAddToRoster}
                 className="text-sm rounded-lg px-4 py-2 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-colors font-medium"
               >
