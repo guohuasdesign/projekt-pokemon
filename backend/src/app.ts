@@ -2,8 +2,9 @@ import express from "express";
 import "./db/index.ts";
 import leaderboardRoutes from "./routers/leaderboardRoutes.ts";
 import cors from "cors";
+import dotenv from "dotenv";
 //import { errorHandler, notFound } from "./middleware/index.ts";
-
+dotenv.config();
 const app = express();
 app.use(
   cors({
