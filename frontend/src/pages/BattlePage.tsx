@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { getPokemon, type Pokemon } from "../lib/pokemonAPI";
-import  StatsRadar from "../components/StatsRadar"; // add Base Stats Radar Chart
+import StatsRadar from "../components/StatsRadar";
 
 type BattleState = "idle" | "fighting" | "finished";
 
@@ -12,9 +12,10 @@ export default function BattlePage() {
   const [opponentHP, setOpponentHP] = useState(100);
   const [battleState, setBattleState] = useState<BattleState>("idle");
   const [result, setResult] = useState<string | null>(null);
+  const [points, setPoints] = useState<number | null>(null);
   const [log, setLog] = useState<string[]>([]);
 
-  // 🧩 Load player Pokémon from localStorage
+  // Load player Pokémon from localStorage
   useEffect(() => {
     const stored = localStorage.getItem("selectedPokemon");
     if (stored) setPlayer(JSON.parse(stored));
@@ -29,10 +30,32 @@ export default function BattlePage() {
     })();
   }, []);
 
-  // ⚔️ Battle logic
+  // Post score to leaderboard
+  const postScore = async (score: number) => {
+    const token = localStorage.getItem("token");
+    if (!token) return console.warn("⚠️ No token found, not posting score.");
+
+    try {
+      const res = await fetch("http://localhost:3000/leaderboard", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ score }),
+      });
+
+      if (!res.ok) throw new Error("Failed to post score");
+      const data = await res.json();
+      console.log("✅ Score submitted to leaderboard:", data);
+    } catch (err: any) {
+      console.error("Error posting score:", err.message);
+    }
+  };
+
+  // Battle logic
   const handleAttack = () => {
-    if (!player || !opponent) return;
-    if (battleState === "fighting") return;
+    if (!player || !opponent || battleState === "fighting") return;
 
     setBattleState("fighting");
 
@@ -45,23 +68,35 @@ export default function BattlePage() {
     const damageToOpponent = Math.floor((playerAttack / opponentPower) * 25);
     const damageToPlayer = Math.floor((opponentAttack / playerPower) * 25);
 
-    setOpponentHP((hp) => Math.max(0, hp - damageToOpponent));
-    setPlayerHP((hp) => Math.max(0, hp - damageToPlayer));
+    const newPlayerHP = Math.max(0, playerHP - damageToPlayer);
+    const newOpponentHP = Math.max(0, opponentHP - damageToOpponent);
+
+    setPlayerHP(newPlayerHP);
+    setOpponentHP(newOpponentHP);
 
     const logEntry = `⚔️ ${player.name} dealt ${damageToOpponent} damage! 💥 ${opponent.name} dealt ${damageToPlayer}!`;
     setLog((prev) => [logEntry, ...prev]);
 
     setTimeout(() => {
-      if (
-        playerHP - damageToPlayer <= 0 &&
-        opponentHP - damageToOpponent <= 0
-      ) {
-        setResult("It's a draw! 😐");
-      } else if (playerHP - damageToPlayer <= 0) {
-        setResult(`You lose! ${opponent.name} wins 💀`);
-      } else if (opponentHP - damageToOpponent <= 0) {
-        setResult(`You win! ${player.name} triumphs 🎉`);
+      let pointsEarned = 0;
+      let resultMessage = "";
+
+      if (newPlayerHP <= 0 && newOpponentHP <= 0) {
+        resultMessage = "It's a draw! 😐";
+        pointsEarned = 5;
+      } else if (newPlayerHP <= 0) {
+        resultMessage = `You lose! ${opponent.name} wins 💀`;
+        pointsEarned = 2;
+      } else if (newOpponentHP <= 0) {
+        resultMessage = `You win! ${player.name} triumphs 🎉`;
+        pointsEarned = 10;
       }
+
+      setResult(resultMessage);
+      setPoints(pointsEarned);
+
+      if (pointsEarned > 0) postScore(pointsEarned);
+
       setBattleState("idle");
     }, 800);
   };
@@ -72,7 +107,7 @@ export default function BattlePage() {
   return (
     <div className="mx-auto max-w-5xl p-4 text-center">
       <h1 className="text-2xl md:text-3xl font-bold mb-6">⚔️ Pokémon Battle</h1>
-  
+
       <div className="flex flex-wrap justify-between items-center gap-6 md:gap-10">
         {/* Left (Player side) */}
         <motion.div
@@ -98,10 +133,10 @@ export default function BattlePage() {
           </div>
           <HPBar value={playerHP} color="emerald" />
         </motion.div>
-  
+
         {/* VS */}
         <span className="text-xl md:text-2xl font-bold text-slate-700">VS</span>
-  
+
         {/* Right (Opponent side) */}
         <motion.div
           initial={{ opacity: 0, x: 50 }}
@@ -127,7 +162,7 @@ export default function BattlePage() {
           <HPBar value={opponentHP} color="rose" />
         </motion.div>
       </div>
-  
+
       {/* Attack button */}
       {!result && (
         <motion.button
@@ -140,25 +175,30 @@ export default function BattlePage() {
           Begin to battle!
         </motion.button>
       )}
-  
+
       {/* Result section */}
       {result && (
         <motion.div
-          className="mt-6 text-xl md:text-2xl font-bold"
+          className="mt-6 text-xl md:text-2xl font-bold flex flex-col items-center gap-2"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          {result}
+          <p>{result}</p>
+          {points !== null && (
+            <p className="text-lg text-indigo-600 font-semibold">
+              ⭐ You earned <span className="font-bold">{points}</span> points!
+            </p>
+          )}
           <button
-            className="ml-4 text-sm bg-slate-200 px-3 py-1 rounded hover:bg-slate-300"
+            className="mt-2 text-sm bg-slate-200 px-3 py-1 rounded hover:bg-slate-300"
             onClick={() => window.location.reload()}
           >
             New Battle
           </button>
         </motion.div>
       )}
-  
+
       {/* Battle Log */}
       <div className="mt-8 text-left bg-slate-50 border rounded-lg p-4 max-h-48 overflow-y-auto">
         <h3 className="font-semibold mb-2 text-sm md:text-base">Battle Log</h3>
@@ -180,20 +220,10 @@ export default function BattlePage() {
       </div>
     </div>
   );
-
 }
 
-// 💚 Animated HP bar component (fixed color issue)
-function HPBar({
-  label,
-  value,
-  color,
-}: {
-  label: string;
-  value: number;
-  color: string;
-}) {
-  // Explicit Tailwind color map (so classes aren’t purged)
+// 💚 Animated HP bar
+function HPBar({ value, color }: { value: number; color: string }) {
   const colorMap: Record<string, string> = {
     emerald: "bg-emerald-500",
     rose: "bg-rose-500",
